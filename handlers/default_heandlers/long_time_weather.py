@@ -1,18 +1,21 @@
 import requests
 import math
 
-from datetime import datetime
 from telebot import types
 
 from config_data.config import WEATHER_KEY
 from loader import bot
 from structure import weather_image
-from states.user_states import UserInfoState
 from utils.wind_description import wind_info
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('5days'))
 def start_message(message: types.Message):
+    """
+    Функция, принимающая от пользователя название города
+    :param message:
+    :return:
+    """
     bot.send_message(message.from_user.id,
                      f'Привет {message.from_user.first_name}'
                      f'. Напиши мне название города, и я дам тебе сводку по погоде на 5 дней.'
@@ -21,6 +24,12 @@ def start_message(message: types.Message):
 
 @bot.message_handler()
 def city_geolocation(message):
+    """
+    Функция, принимающая название города и передающая его для получения координат
+    города (широты и долготы)
+    :param message:
+    :return:
+    """
     city = requests.get(
                         f'http://api.openweathermap.org/geo/1.0/direct?'
                         f'q={message.text}&limit=1&appid={WEATHER_KEY}'
@@ -35,6 +44,14 @@ def city_geolocation(message):
 
 
 def weather_for_week(lat, lon, message):
+    """
+    Функция, принимающая значения широты и долготы, и передающая их
+    для получения длительного прогноза погоды
+    :param lat: Широта
+    :param lon: Долгота
+    :param message:
+    :return:
+    """
     try:
         weather_list = list()
         weekly_weather = requests.get(

@@ -5,19 +5,30 @@ from telebot import types
 
 from config_data.config import WEATHER_KEY
 from loader import bot
-from states.user_states import UserInfoState
 from structure import weather_image
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('now'))
 def start_message(message: types.Message):
+    """
+    Функция, принимающая от пользователя название города
+    :param message:
+    :return:
+    """
     bot.send_message(message.from_user.id,
                      f'Привет {message.from_user.first_name}'
                      f'. Напиши мне название города, и я дам тебе сводку по погоде.'
                      )
 
-# @bot.message_handler()
+
+@bot.message_handler()
 def get_weather(message: types.Message):
+    """
+    Функция, принимающая название города,
+    и выдающая сводку по погоде в данный момент.
+    :param message:
+    :return:
+    """
     try:
         city_info = requests.get(
             f'https://api.openweathermap.org/data/2.5/weather?q={message.text}&appid={WEATHER_KEY}&units=metric'
