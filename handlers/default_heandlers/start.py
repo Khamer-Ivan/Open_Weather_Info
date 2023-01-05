@@ -1,34 +1,27 @@
-import sqlite3 as sq
-
+from peewee import *
 from telebot import types
 from telebot.types import Message
 
 from loader import bot
 
+db = SqliteDatabase('weather.db')
+
+
+class Weather(Model):
+    user_id = IntegerField()
+    name = CharField()
+    request = CharField()
+    date = CharField()
+
+    class Meta:
+        database = db
+
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('menu'))
 @bot.message_handler(commands=['start'])
 def bot_start(message: Message):
-    """
-    Функция инициализации Inline кнопок, передающая ответ в weather или long_time_weather
-    :param message:
-    :return:
-    """
-    with sq.connect('weather.db') as con:
-        cur = con.cursor()
 
-        # cur.execute('DROP TABLE IF EXISTS weather')
-        cur.execute(
-            """
-                    CREATE TABLE IF NOT EXISTS weather
-                    (
-                    id INTEGER,
-                    name TEXT,
-                    request TEXT,
-                    date DATETIME
-                    )
-                    """
-        )
+    Weather.create_table()
 
     start_menu = types.InlineKeyboardMarkup(row_width=1)
     weather_button = types.InlineKeyboardButton(text='Узнать погоду', callback_data='weather_button')

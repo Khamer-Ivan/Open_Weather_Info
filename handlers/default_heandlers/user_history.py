@@ -1,12 +1,12 @@
 import timedelta
-import sqlite3 as sq
 from telebot import types
 from telebot.types import Message
 from datetime import datetime
 
 from loader import bot
-
-now = datetime.now()
+from handlers.default_heandlers.start import Weather
+from keyboards.inline import delite_history_button
+from handlers.default_heandlers.start import bot_start
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('user_history'))
@@ -18,65 +18,53 @@ def weather_button(message: Message) -> None:
     menu = types.InlineKeyboardButton(text='Возврат в основное меню', callback_data='menu')
     start_menu.add(for_day, for_week, for_all, menu)
     bot.send_message(
-                     message.from_user.id,
-                     'Пожалуйста, выберите период отображениям запросов.',
-                     reply_markup=start_menu
-                     )
+        message.from_user.id,
+        'Пожалуйста, выберите период отображения запросов.',
+        reply_markup=start_menu
+    )
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_day'))
 def history_for_day(message: Message) -> None:
-    days_before = 1
-    date_days_before = datetime.now() - timedelta.Timedelta(days=days_before)
-    print(now.strftime("%Y-%m-%d %H:%M:%S"))
-    print(date_days_before.strftime("%Y-%m-%d %H:%M:%S"))
-    with sq.connect('weather.db') as con:
-        cur = con.cursor()
-        cur.execute(
-                    f'SELECT name, request, date FROM weather '
-                    f'WHERE (id = {message.from_user.id}) '
-                    f'AND (date BETWEEN {date_days_before.strftime("%Y-%m-%d %H:%M:%S")} '
-                    f'AND {now.strftime("%Y-%m-%d %H:%M:%S")})'
-                    )
-        result = cur.fetchall()
-        for history in result:
-            text = ''
-            for emem in history:
-                text += f'{emem}\n'
-            bot.send_message(message.from_user.id, text)
+    text = 'История запросов за день:\n'
+    for history in Weather.select().where(
+            (Weather.user_id == message.from_user.id)
+            & (Weather.date.startswith(datetime.now().strftime("%Y-%m-%d")))):
+        text += f'\n{history.name}\n{history.request}\n{history.date}\n'
+    if len(text) > 26:
+        bot.send_message(message.from_user.id, text)
+        delite_history_button.delete_day(message)
+    else:
+        bot.send_message(message.from_user.id, 'История запросов пуста.')
+        bot_start(message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_week'))
 def history_for_week(message: Message) -> None:
-    days_before = 7
-    date_days_before = datetime.now() - timedelta.Timedelta(days=days_before)
-    with sq.connect('weather.db') as con:
-        cur = con.cursor()
-        cur.execute(
-                    f'SELECT name, request, date FROM weather '
-                    f'WHERE id = {message.from_user.id} '
-                    f'AND date BETWEEN {date_days_before.strftime("%Y-%m-%d %H:%M:%S")} '
-                    f'AND {now.strftime("%Y-%m-%d %H:%M:%S")}'
-                    )
-        result = cur.fetchall()
-        for history in result:
-            text = ''
-            for emem in history:
-                text += f'{emem}\n'
-            bot.send_message(message.from_user.id, text)
+    date_days_before = datetime.now() - timedelta.Timedelta(days=7)
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    week_ago = date_days_before.strftime("%Y-%m-%d %H:%M:%S")
+    text = 'История запросов за неделю:\n'
+    for history in Weather.select().where(
+            (Weather.user_id == message.from_user.id)
+            & (Weather.date.between(week_ago, now))):
+        text += f'\n{history.name}\n{history.request}\n{history.date}\n'
+    if len(text) > 28:
+        bot.send_message(message.from_user.id, text)
+        delite_history_button.delete_day(message)
+    else:
+        bot.send_message(message.from_user.id, 'История запросов пуста.')
+        bot_start(message)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_all'))
 def history_for_all(message: Message) -> None:
-    with sq.connect('weather.db') as con:
-        cur = con.cursor()
-        cur.execute(
-                    f'SELECT name, request, date FROM weather '
-                    f'WHERE id = {message.from_user.id}'
-                    )
-        result = cur.fetchall()
-        for history in result:
-            text = ''
-            for emem in history:
-                text += f'{emem}\n'
-            bot.send_message(message.from_user.id, text)
+    text = 'История запросов за всё время:\n'
+    for history in Weather.select().where(Weather.user_id == message.from_user.id):
+        text += f'\n{history.name}\n{history.request}\n{history.date}\n'
+    if len(text) > 31:
+        bot.send_message(message.from_user.id, text)
+        delite_history_button.delete_day(message)
+    else:
+        bot.send_message(message.from_user.id, 'История запросов пуста.')
+        bot_start(message)

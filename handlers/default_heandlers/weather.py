@@ -11,16 +11,15 @@ from structure import weather_image
 from states.user_states import UserInfoState
 from utils.wind_description import wind_info
 from handlers.default_heandlers.weather_button import weather_button
-
-now = datetime.now()
+from handlers.default_heandlers.start import Weather
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('5days'))
-def start_message(message: types.Message):
+def start_message(message: types.Message) -> None:
     """
     Функция, принимающая от пользователя название города
     :param message:
-    :return:
+    :return: None
     """
     UserInfoState.five_days = 1
     bot.send_message(message.from_user.id,
@@ -88,17 +87,11 @@ def get_weather(message: types.Message) -> None:
                              f'\n😊 ХОРОШЕГО ДНЯ'
                              )
             UserInfoState.day = 0
-            with sq.connect('weather.db') as con:
-                cur = con.cursor()
-                text = f'Запрос текущей погоды в городе {city}'
-                cur.execute('INSERT INTO weather VALUES(?,?,?,?);',
-                            (
-                             message.from_user.id,
-                             message.from_user.full_name,
-                             text,
-                             now.strftime("%Y-%m-%d %H:%M:%S")
-                            )
-                            )
+            text = f'Запрос текущей погоды в городе {city}'
+            Weather.create(
+                           user_id=message.from_user.id, name=message.from_user.full_name,
+                           request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                           )
             weather_button(message)
 
         except Exception:
@@ -164,18 +157,15 @@ def weather_for_week(city, lat, lon, message: types.Message) -> None:
                                 f'\n🔹Ветер {wind_side} {wind_speed} м/c'
                                 )
         UserInfoState.five_days = 0
-        [bot.send_message(message.from_user.id, day_info) for day_info in weather_list]
-        with sq.connect('weather.db') as con:
-            cur = con.cursor()
-            text = f'Запрос погоды на 5 дней в городе {city}'
-            cur.execute('INSERT INTO weather VALUES(?,?,?,?);',
-                        (
-                            message.from_user.id,
-                            message.from_user.full_name,
-                            text,
-                            now.strftime("%Y-%m-%d %H:%M:%S")
-                        )
-                        )
+        text = ''
+        for day_info in weather_list:
+            text += f'\n{day_info}\n'
+        bot.send_message(message.from_user.id, text)
+        text = f'Запрос погоды на 5 дней в городе {city}'
+        Weather.create(
+                       user_id=message.from_user.id, name=message.from_user.full_name,
+                       request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                       )
         weather_button(message)
 
     except Exception:
