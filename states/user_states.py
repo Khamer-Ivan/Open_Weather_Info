@@ -2,5 +2,6 @@ from telebot.handler_backends import State, StatesGroup
 
 
 class UserInfoState(StatesGroup):
-    day = State()
-    five_days = State()
+    flag_day = 0
+    flag_5_day = 0
+    language = ''

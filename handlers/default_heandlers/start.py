@@ -17,15 +17,16 @@ class Weather(Model):
         database = db
 
 
-@bot.callback_query_handler(func=lambda call: call.data.endswith('menu'))
 @bot.message_handler(commands=['start'])
 def bot_start(message: Message):
-
     Weather.create_table()
 
-    start_menu = types.InlineKeyboardMarkup(row_width=1)
-    weather_button = types.InlineKeyboardButton(text='Узнать погоду', callback_data='weather_button')
-    user_history = types.InlineKeyboardButton(text='История запросов', callback_data='user_history')
-    start_menu.add(weather_button, user_history)
+    start_menu = types.InlineKeyboardMarkup(row_width=2)
+    english = types.InlineKeyboardButton(text='English', callback_data='en_1')
+    russian = types.InlineKeyboardButton(text='Русский', callback_data='ru_1')
+    francais = types.InlineKeyboardButton(text='Français', callback_data='fr_1')
+    german = types.InlineKeyboardButton(text='Deutsch', callback_data='de_1')
+    start_menu.add(english, russian, francais, german)
     bot.send_message(message.from_user.id,
-                     f'Привет {message.from_user.first_name}. Пожалуйста, выберите команду.', reply_markup=start_menu)
+                     f'Hello, {message.from_user.full_name},'
+                     f' please select the language to work in the application.', reply_markup=start_menu)

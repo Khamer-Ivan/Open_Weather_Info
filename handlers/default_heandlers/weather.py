@@ -12,6 +12,7 @@ from states.user_states import UserInfoState
 from utils.wind_description import wind_info
 from handlers.default_heandlers.weather_button import weather_button
 from handlers.default_heandlers.start import Weather
+from translation import translator as tr
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('5days'))
@@ -21,10 +22,14 @@ def start_message(message: types.Message) -> None:
     :param message:
     :return: None
     """
-    UserInfoState.five_days = 1
-    bot.send_message(message.from_user.id,
-                     'Напиши мне название города, и я дам тебе сводку по погоде на 5 дней.'
-                     )
+    UserInfoState.flag_5_day = 1
+    bot.send_message(
+        message.from_user.id,
+        tr('Напиши мне название города, и я дам тебе сводку по погоде на 5 дней.',
+           'ru',
+           UserInfoState.language
+           )
+    )
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('now'))
@@ -34,10 +39,14 @@ def start_message(message: types.Message) -> None:
     :param message:
     :return: None
     """
-    UserInfoState.day = 1
-    bot.send_message(message.from_user.id,
-                     'Напиши мне название города, и я дам тебе сводку по погоде.'
-                     )
+    UserInfoState.flag_day = 1
+    bot.send_message(
+        message.from_user.id,
+        tr('Напиши мне название города, и я дам тебе сводку по погоде.',
+           'ru',
+           UserInfoState.language
+           )
+    )
 
 
 @bot.message_handler()
@@ -48,12 +57,12 @@ def get_weather(message: types.Message) -> None:
     :param message:
     :return: None
     """
-    if UserInfoState.day == 1:
+    if UserInfoState.flag_day == 1:
         try:
             city_info = requests.get(
-                                     f'https://api.openweathermap.org/data/2.5/weather?'
-                                     f'q={message.text}&appid={WEATHER_KEY}&units=metric'
-                                     )
+                f'https://api.openweathermap.org/data/2.5/weather?'
+                f'q={message.text}&appid={WEATHER_KEY}&units=metric'
+            )
             city_data = city_info.json()
 
             city = city_data['name']
@@ -73,35 +82,42 @@ def get_weather(message: types.Message) -> None:
             else:
                 description = ''
 
-            bot.send_message(message.from_user.id,
-                             f'Погода в городе {city}:'
-                             f'\n'
-                             f'\n🔹 Температура: {int(cur_temp)}C° {description}'
-                             f'\n🔹 Влажность: {humidity} %'
-                             f'\n🔹 Давление: {pressure} мм.рт.ст.'
-                             f'\n🔹 Ветер {wind_side}, {wind_speed} м/c'
-                             f'\n🔹 Восход солнца: {sunrise}'
-                             f'\n🔹 Закат: {sunset}'
-                             f'\n🔹 Продолжительность светового дня: {day_long}'
-                             f'\n'
-                             f'\n😊 ХОРОШЕГО ДНЯ'
-                             )
-            UserInfoState.day = 0
-            text = f'Запрос текущей погоды в городе {city}'
+            result = (f'Погода в городе {city}:'
+                      f'\n'
+                      f'\n🔹 Температура: {int(cur_temp)}C° {description}'
+                      f'\n🔹 Влажность: {humidity} %'
+                      f'\n🔹 Давление: {pressure} мм.рт.ст.'
+                      f'\n🔹 Ветер {wind_side}, {wind_speed} м/c'
+                      f'\n🔹 Восход: {sunrise}'
+                      f'\n🔹 Закат: {sunset}'
+                      f'\n🔹 Продолжительность светового дня: {day_long}'
+                      f'\n'
+                      f'\n😊 ХОРОШЕГО ДНЯ')
+            bot.send_message(
+                message.from_user.id,
+                tr(result, 'ru', UserInfoState.language)
+            )
+            UserInfoState.flag_day = 0
+            text = tr(f'Запрос текущей погоды в городе {city}', 'ru', UserInfoState.language)
             Weather.create(
-                           user_id=message.from_user.id, name=message.from_user.full_name,
-                           request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                           )
+                user_id=message.from_user.id, name=message.from_user.full_name,
+                request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            )
             weather_button(message)
 
         except Exception:
-            bot.send_message(message.from_user.id, '📝Проверьте правильность ввода города.📝')
-    elif UserInfoState.five_days == 1:
+            bot.send_message(
+                message.from_user.id,
+                tr('📝Проверьте правильность ввода города.📝',
+                   'ru',
+                   UserInfoState.language)
+            )
+    elif UserInfoState.flag_5_day == 1:
         try:
             city = requests.get(
-                                f'http://api.openweathermap.org/geo/1.0/direct?'
-                                f'q={message.text}&limit=1&appid={WEATHER_KEY}'
-                                )
+                f'http://api.openweathermap.org/geo/1.0/direct?'
+                f'q={message.text}&limit=1&appid={WEATHER_KEY}'
+            )
 
             city_geo = city.json()
 
@@ -111,7 +127,12 @@ def get_weather(message: types.Message) -> None:
 
             weather_for_week(city_name, lat, lon, message)
         except Exception:
-            bot.send_message(message.from_user.id, '📝Проверьте правильность ввода города.📝')
+            bot.send_message(
+                message.from_user.id,
+                tr('📝Проверьте правильность ввода города.📝',
+                   'ru',
+                   UserInfoState.language)
+            )
 
 
 def weather_for_week(city, lat, lon, message: types.Message) -> None:
@@ -131,7 +152,7 @@ def weather_for_week(city, lat, lon, message: types.Message) -> None:
             f'lat={lat}&lon={lon}&appid={WEATHER_KEY}&units=metric'
         )
         weather_data = weekly_weather.json()
-        weather_list.append('Погода в городе {} на 5 дней'.format(city))
+        weather_list.append(tr(f'Погода в городе {city} на 5 дней', 'ru', UserInfoState.language))
         need = weather_data['list']
         for day in range(0, len(need), 8):
             date = need[day]['dt_txt']
@@ -148,25 +169,30 @@ def weather_for_week(city, lat, lon, message: types.Message) -> None:
                 description = weather_image[weather_descr]
             else:
                 description = ''
-
-            weather_list.append(
-                                f'Погода на {date}:'
-                                f'\n🔹Температура: {int(temp)}C°, ощущается как {int(temp_feels_like)}C° {description}'
-                                f'\n🔹Атмосферное давление: {pressure} мм.рт.ст.'
-                                f'\n🔹Влажность воздуха: {humidity} %'
-                                f'\n🔹Ветер {wind_side} {wind_speed} м/c'
-                                )
-        UserInfoState.five_days = 0
+            result = (f'Погода на {date}:'
+                      f'\n🔹Температура: {int(temp)}C°, ощущается как {int(temp_feels_like)}C° {description}'
+                      f'\n🔹Давление: {pressure} мм.рт.ст.'
+                      f'\n🔹Влажность: {humidity} %'
+                      f'\n🔹Ветер {wind_side} {wind_speed} м/c'
+                      )
+            weather_list.append(tr(result, 'ru', UserInfoState.language))
+        UserInfoState.flag_5_day = 0
         text = ''
         for day_info in weather_list:
             text += f'\n{day_info}\n'
         bot.send_message(message.from_user.id, text)
-        text = f'Запрос погоды на 5 дней в городе {city}'
+        text = tr(f'Запрос погоды на 5 дней в городе {city}', 'ru', UserInfoState.language)
         Weather.create(
-                       user_id=message.from_user.id, name=message.from_user.full_name,
-                       request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                       )
+            user_id=message.from_user.id, name=message.from_user.full_name,
+            request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        )
         weather_button(message)
 
+
     except Exception:
-        bot.send_message(message.from_user.id, '📝Проверьте правильность ввода города.📝')
+        bot.send_message(
+                            message.from_user.id,
+                            tr('📝Проверьте правильность ввода города.📝',
+                                'ru',
+                                UserInfoState.language)
+                        )

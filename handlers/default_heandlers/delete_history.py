@@ -5,6 +5,8 @@ from telebot.types import Message
 from loader import bot
 from handlers.default_heandlers.start import Weather
 from handlers.default_heandlers.start import bot_start
+from states.user_states import UserInfoState
+from translation import translator as tr
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('delete_day'))
@@ -15,8 +17,9 @@ def delete_day(message: Message) -> None:
             & (Weather.date.startswith(datetime.now().strftime("%Y-%m-%d")))):
         history.delete_instance()
         message_counter += 1
-    bot.send_message(message.from_user.id, f'История запросов за выбранный период очищена.'
-                                           f'Удалено {message_counter} запросов')
+    bot.send_message(message.from_user.id, tr(f'История запросов за выбранный период очищена.'
+                                              f'Удалено запросов: {message_counter}', 'ru', UserInfoState.language)
+                     )
     bot_start(message)
 
 
@@ -31,8 +34,9 @@ def delete_week(message: Message) -> None:
             & (Weather.date.between(week_ago, now))):
         history.delete_instance()
         message_counter += 1
-    bot.send_message(message.from_user.id, f'История запросов за выбранный период очищена.'
-                                           f'Удалено {message_counter} запросов')
+    bot.send_message(message.from_user.id, tr(f'История запросов за выбранный период очищена.'
+                                              f'Удалено запросов: {message_counter}', 'ru', UserInfoState.language)
+                     )
     bot_start(message)
 
 
@@ -42,6 +46,7 @@ def delete_all(message: Message) -> None:
     for history in Weather.select().where(Weather.user_id == message.from_user.id):
         history.delete_instance()
         message_counter += 1
-    bot.send_message(message.from_user.id, f'История запросов за выбранный период очищена.'
-                                           f'Удалено {message_counter} запросов')
+    bot.send_message(message.from_user.id, tr(f'История запросов за выбранный период очищена.'
+                                              f'Удалено запросов: {message_counter}', 'ru', UserInfoState.language)
+                     )
     bot_start(message)

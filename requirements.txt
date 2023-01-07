@@ -1,2 +1,4 @@
 pyTelegramBotAPI==4.8.0
 python-dotenv==0.21.0
+timedelta==2020.12.3
+googletrans==3.1.0a0

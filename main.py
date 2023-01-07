@@ -1,5 +1,5 @@
 from loader import bot
-import handlers
+from handlers import default_heandlers
 from utils.set_bot_commands import set_default_commands
 
 if __name__ == '__main__':
