@@ -1,4 +1,6 @@
+import gettext
 from googletrans import Translator
+from pathlib import Path
 
 
 def translator(text, lang_1, lang_2):
