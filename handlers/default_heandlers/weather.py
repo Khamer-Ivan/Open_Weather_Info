@@ -2,7 +2,7 @@ import requests
 import math
 
 from datetime import datetime
-from telebot import types
+from telebot.types import CallbackQuery, Message
 from googletrans import Translator
 
 from config_data.config import WEATHER_KEY
@@ -17,32 +17,34 @@ from utils.logging_setting import exception_handler
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('5days'))
 @exception_handler
-def start_message(message: types.Message) -> None:
+def start_message(call: CallbackQuery) -> None:
     """
     Функция, принимающая от пользователя название города
-    :param message:
+    :param call: СallbackQuery
     :return: None
     """
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     UserInfoState.flag_5_day = 1
     bot.send_message(
-        message.from_user.id, UserInfoState.language['weather_5_days'])
+        call.message.chat.id, UserInfoState.language['weather_5_days'])
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('now'))
-def start_message(message: types.Message) -> None:
+def start_message(call: CallbackQuery) -> None:
     """
     Функция, принимающая от пользователя название города
-    :param message:
+    :param call: CallbackQuery
     :return: None
     """
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     UserInfoState.flag_day = 1
     bot.send_message(
-        message.from_user.id, UserInfoState.language['weather_one_day'])
+        call.message.chat.id, UserInfoState.language['weather_one_day'])
 
 
 @bot.message_handler()
 @exception_handler
-def get_weather(message: types.Message) -> None:
+def get_weather(message: Message) -> None:
     """
     Функция, принимающая название города,
     и выдающая сводку по погоде в данный момент.
@@ -96,7 +98,7 @@ def get_weather(message: types.Message) -> None:
             user_id=message.from_user.id, name=message.from_user.full_name,
             request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         )
-        weather_button(message)
+        weather_button(UserInfoState.user_call)
 
     elif UserInfoState.flag_5_day == 1:
         city = requests.get(
@@ -114,7 +116,7 @@ def get_weather(message: types.Message) -> None:
 
 
 @exception_handler
-def weather_for_week(city, lat, lon, message: types.Message) -> None:
+def weather_for_week(city, lat, lon, message: Message) -> None:
     """
         Функция, принимающая значения широты и долготы, и передающая их
         для получения длительного прогноза погоды
@@ -168,4 +170,4 @@ def weather_for_week(city, lat, lon, message: types.Message) -> None:
         user_id=message.from_user.id, name=message.from_user.full_name,
         request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     )
-    weather_button(message)
+    weather_button(UserInfoState.user_call)

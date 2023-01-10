@@ -6,7 +6,7 @@ from states.user_states import UserInfoState
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('weather_button'))
-def weather_button(message: Message):
+def weather_button(call: CallbackQuery) -> None:
     # bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
 
     start_menu = types.InlineKeyboardMarkup(row_width=1)
@@ -24,6 +24,6 @@ def weather_button(message: Message):
                                       )
     start_menu.add(weather_now, weather_for_week, menu)
     bot.send_message(
-                        message.from_user.id, UserInfoState.language['choose_command'],
+                        call.message.chat.id, UserInfoState.language['choose_command'],
                         reply_markup=start_menu,
                     )

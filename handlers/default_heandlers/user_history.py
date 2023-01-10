@@ -1,17 +1,18 @@
 import timedelta
 from telebot import types
-from telebot.types import Message
+from telebot.types import CallbackQuery
 from datetime import datetime
 
 from loader import bot
 from handlers.default_heandlers.start import Weather
 from keyboards.inline import delite_history_button
-from handlers.default_heandlers.start import bot_start
+from handlers.default_heandlers.menu import main_menu
 from states.user_states import UserInfoState
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('user_history'))
-def weather_button(message: Message) -> None:
+def weather_button(call: CallbackQuery) -> None:
+    bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     start_menu = types.InlineKeyboardMarkup(row_width=1)
     for_day = types.InlineKeyboardButton(
                                             text=UserInfoState.language['for_day'],
@@ -30,53 +31,53 @@ def weather_button(message: Message) -> None:
                                             )
     start_menu.add(for_day, for_week, for_all, menu)
     bot.send_message(
-                        message.from_user.id,
+                        call.message.chat.id,
                         UserInfoState.language['choose_history'],
                         reply_markup=start_menu
                         )
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_day'))
-def history_for_day(message: Message) -> None:
+def history_for_day(call: CallbackQuery) -> None:
     text = UserInfoState.language['history_day']
     for history in Weather.select().where(
-            (Weather.user_id == message.from_user.id)
+            (Weather.user_id == UserInfoState.user_id)
             & (Weather.date.startswith(datetime.now().strftime("%Y-%m-%d")))):
         text += f'\n{history.name}\n{history.request}\n{history.date}\n'
     if len(text) > 26:
-        bot.send_message(message.from_user.id, text)
-        delite_history_button.delete_day(message)
+        bot.send_message(call.message.chat.id, text)
+        delite_history_button.delete_day(call)
     else:
-        bot.send_message(message.from_user.id, UserInfoState.language['history_empty'])
-        bot_start(message)
+        bot.send_message(call.message.chat.id, UserInfoState.language['history_empty'])
+        main_menu(call)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_week'))
-def history_for_week(message: Message) -> None:
+def history_for_week(call: CallbackQuery) -> None:
     date_days_before = datetime.now() - timedelta.Timedelta(days=7)
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     week_ago = date_days_before.strftime("%Y-%m-%d %H:%M:%S")
     text = UserInfoState.language['history_week']
     for history in Weather.select().where(
-            (Weather.user_id == message.from_user.id)
+            (Weather.user_id == UserInfoState.user_id)
             & (Weather.date.between(week_ago, now))):
         text += f'\n{history.name}\n{history.request}\n{history.date}\n'
     if len(text) > 28:
-        bot.send_message(message.from_user.id, text)
-        delite_history_button.delete_day(message)
+        bot.send_message(call.message.chat.id, text)
+        delite_history_button.delete_week(call)
     else:
-        bot.send_message(message.from_user.id, UserInfoState.language['history_empty'])
-        bot_start(message)
+        bot.send_message(call.message.chat.id, UserInfoState.language['history_empty'])
+        main_menu(call)
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_all'))
-def history_for_all(message: Message) -> None:
+def history_for_all(call: CallbackQuery) -> None:
     text = UserInfoState.language['history_all']
-    for history in Weather.select().where(Weather.user_id == message.from_user.id):
+    for history in Weather.select().where(Weather.user_id == UserInfoState.user_id):
         text += f'\n{history.name}\n{history.request}\n{history.date}\n'
     if len(text) > 31:
-        bot.send_message(message.from_user.id, text)
-        delite_history_button.delete_day(message)
+        bot.send_message(call.message.chat.id, text)
+        delite_history_button.delete_all(call)
     else:
-        bot.send_message(message.from_user.id, UserInfoState.language['history_empty'])
-        bot_start(message)
+        bot.send_message(bot.message.chat.id, UserInfoState.language['history_empty'])
+        main_menu(call)

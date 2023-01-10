@@ -6,6 +6,7 @@ from loader import bot
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('menu'))
 def main_menu(call: CallbackQuery):
+    UserInfoState.user_call = call
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     start_menu = types.InlineKeyboardMarkup(row_width=1)
     weather_button = types.InlineKeyboardButton(
