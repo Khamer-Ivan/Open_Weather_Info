@@ -19,7 +19,8 @@ from utils.logging_setting import exception_handler
 @exception_handler
 def start_message(call: CallbackQuery) -> None:
     """
-    Функция, принимающая от пользователя название города
+    Функция, принимающая от пользователя название города, для
+    предоставления информации по погоде на пять дней.
     :param call: СallbackQuery
     :return: None
     """
@@ -30,9 +31,11 @@ def start_message(call: CallbackQuery) -> None:
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('now'))
+@exception_handler
 def start_message(call: CallbackQuery) -> None:
     """
-    Функция, принимающая от пользователя название города
+    Функция, принимающая от пользователя название города для
+    предоставления информации по погоде на данный момент.
     :param call: CallbackQuery
     :return: None
     """
@@ -46,8 +49,8 @@ def start_message(call: CallbackQuery) -> None:
 @exception_handler
 def get_weather(message: Message) -> None:
     """
-    Функция, принимающая название города,
-    и выдающая сводку по погоде в данный момент.
+    Функция, принимающая название города, и предоставляющая
+    информацию по погоде, на период, выбранный пользователем.
     :param message:
     :return: None
     """
@@ -71,9 +74,9 @@ def get_weather(message: Message) -> None:
         wind_side = wind_info(wind_deg)
         translation = Translator()
         city = translation.translate(text=city, src='en', dest=UserInfoState.language_code).text
-
-        if weather_descr in weather_image:
-            description = weather_image[weather_descr]
+        weather_img = weather_image()
+        if weather_descr in weather_img:
+            description = weather_img[weather_descr]
         else:
             description = ''
 
@@ -88,7 +91,7 @@ def get_weather(message: Message) -> None:
                   f'\n🔹 {UserInfoState.language["res_8"]} {sunset}'
                   f'\n🔹 {UserInfoState.language["res_9"]} {day_long}'
                   f'\n'
-                  f'\n😊 ХОРОШЕГО ДНЯ'
+                  f'\n{UserInfoState.language["res_10"]}'
                   ),
         bot.send_message(
             message.from_user.id, result)
@@ -146,9 +149,9 @@ def weather_for_week(city, lat, lon, message: Message) -> None:
         wind_speed = math.ceil(need[day]['wind']['speed'])
         wind_deg = need[day]['wind']['deg']
         wind_side = wind_info(wind_deg)
-
-        if weather_descr in weather_image:
-            description = weather_image[weather_descr]
+        weather_img = weather_image()
+        if weather_descr in weather_img:
+            description = weather_img[weather_descr]
         else:
             description = ''
         result = (f'{UserInfoState.language["res_five_day_0"]} {date}:'

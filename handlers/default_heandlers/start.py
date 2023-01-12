@@ -10,6 +10,12 @@ from handlers.default_heandlers.menu import main_menu
 
 @bot.message_handler(commands=['start'])
 def bot_start(message: Message) -> None:
+    """
+    Функция, предоставляющая в виде inline кнопок выбор
+    одного из четырёх языков для работы.
+    :param message: Message
+    :return: None
+    """
     Weather.create_table()
 
     UserInfoState.user_id = message.from_user.id
@@ -27,6 +33,12 @@ def bot_start(message: Message) -> None:
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('_1'))
 def choose_lang(call: CallbackQuery) -> None:
+    """
+    Функция, принимающая ответ пользователя для
+    обработки языка дальнейшей работы бота.
+    :param call: CallbackQuery
+    :return: None
+    """
     if call.data.startswith('ru'):
         UserInfoState.language = russian.translation
         UserInfoState.language_code = 'ru'

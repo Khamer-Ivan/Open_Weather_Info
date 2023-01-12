@@ -1,20 +1,16 @@
+"""
+Словарь для хранения немецкого
+варианта сообщений
+"""
 translation = {
+    'start_': 'Starten Sie den Bot',
+    'help_': 'Hilfe holen',
+    'history_': 'Geschichte ableiten',
     'weather': 'Das Wetter herausfinden',
     'history': 'Abfrageverlauf',
     'choose_command': 'Bitte wählen Sie einen Befehl aus.',
     'weather_5_days': 'Schreibe mir den Namen der Stadt und ich gebe dir eine Wetterübersicht für 5 Tage.',
     'weather_one_day': 'Schreib mir den Namen der Stadt und ich gebe dir eine Wetterübersicht.',
-    'result_day': (f'Wetter in {0}:'
-                   f'\n'
-                   f'\n🔹 Temperatur: {1}C° {2}'
-                   f'\n🔹 Feuchtigkeit: {3} %'
-                   f'\n🔹 Der Druck: {4} mmhg.kunst.'
-                   f'\n🔹 Der Wind {5}, {6} m/c'
-                   f'\n🔹 Aufgang: {7}'
-                   f'\n🔹 Sonnenuntergang: {8}'
-                   f'\n🔹 Dauer des Lichttages: {9}'
-                   f'\n'
-                   f'\n😊 guten Tag.'),
     'res_0': 'Wetter in',
     'res_1': 'Temperatur:',
     'res_2': 'Feuchtigkeit:',
@@ -25,6 +21,7 @@ translation = {
     'res_7': 'Aufgang:',
     'res_8': 'Sonnenuntergang:',
     'res_9': 'Dauer des Lichttages:',
+    'res_10': '😊 guten Tag',
     'log_day': 'Abfrage des aktuellen Wetters in der Stadt',
     'error': '📝Überprüfen Sie, ob die Stadt korrekt eingegeben wurde.📝',
     'res_five_day_0': 'Wetter am',

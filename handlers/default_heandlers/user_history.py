@@ -8,10 +8,19 @@ from handlers.default_heandlers.start import Weather
 from keyboards.inline import delite_history_button
 from handlers.default_heandlers.menu import main_menu
 from states.user_states import UserInfoState
+from utils.logging_setting import exception_handler
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('user_history'))
+@bot.message_handler(commands=['history'])
+@exception_handler
 def weather_button(call: CallbackQuery) -> None:
+    """
+    Функция, предоставляющая в виде inline кнопок выбор
+    периода отображения запросов пользователя.
+    :param call: CallbackQuery
+    :return: None
+    """
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     start_menu = types.InlineKeyboardMarkup(row_width=1)
     for_day = types.InlineKeyboardButton(
@@ -38,7 +47,13 @@ def weather_button(call: CallbackQuery) -> None:
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_day'))
+@exception_handler
 def history_for_day(call: CallbackQuery) -> None:
+    """
+    Функция, предоставляющая историю запросов за один день.
+    :param call: CallbackQuery
+    :return: None
+    """
     text = UserInfoState.language['history_day']
     for history in Weather.select().where(
             (Weather.user_id == UserInfoState.user_id)
@@ -53,7 +68,13 @@ def history_for_day(call: CallbackQuery) -> None:
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_week'))
+@exception_handler
 def history_for_week(call: CallbackQuery) -> None:
+    """
+    Функция, предоставляющая историю запросов за одну неделю.
+    :param call: CallbackQuery
+    :return: None
+    """
     date_days_before = datetime.now() - timedelta.Timedelta(days=7)
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     week_ago = date_days_before.strftime("%Y-%m-%d %H:%M:%S")
@@ -71,7 +92,13 @@ def history_for_week(call: CallbackQuery) -> None:
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('for_all'))
+@exception_handler
 def history_for_all(call: CallbackQuery) -> None:
+    """
+    Функция, предоставляющая всю историю запросов.
+    :param call: CallbackQuery
+    :return: None
+    """
     text = UserInfoState.language['history_all']
     for history in Weather.select().where(Weather.user_id == UserInfoState.user_id):
         text += f'\n{history.name}\n{history.request}\n{history.date}\n'

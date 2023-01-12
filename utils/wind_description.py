@@ -1,7 +1,11 @@
 from states.user_states import UserInfoState as U
 
 
-def wind_info(wind):
+def wind_info(wind: int) -> str:
+    """
+    Функция преобразующая deg значение ветра
+    в направление сторон света
+    """
     c_1 = range(337, 380)
     c_2 = range(0, 22)
     cv = range(22, 67)

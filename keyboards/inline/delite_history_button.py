@@ -6,6 +6,12 @@ from states.user_states import UserInfoState
 
 
 def delete_day(call: CallbackQuery):
+    """
+    Функция, предоставляющая в виде inline кнопок выбор
+    для удаления истории запросов за день.
+    :param call: CallbackQuery
+    :return: None
+    """
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     delete_day_menu = types.InlineKeyboardMarkup(row_width=1)
     delete_button = types.InlineKeyboardButton(
@@ -24,6 +30,12 @@ def delete_day(call: CallbackQuery):
 
 
 def delete_week(call: CallbackQuery):
+    """
+    Функция, предоставляющая в виде inline кнопок выбор
+    для удаления истории запросов за неделю.
+    :param call: CallbackQuery
+    :return: None
+    """
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     delete_week_menu = types.InlineKeyboardMarkup(row_width=1)
     delete_button = types.InlineKeyboardButton(
@@ -42,6 +54,12 @@ def delete_week(call: CallbackQuery):
 
 
 def delete_all(call: CallbackQuery):
+    """
+    Функция, предоставляющая в виде inline кнопок выбор
+    для удаления всей истории запросов.
+    :param call: CallbackQuery
+    :return: None
+    """
     bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
     delete_all_menu = types.InlineKeyboardMarkup(row_width=1)
     delete_button = types.InlineKeyboardButton(

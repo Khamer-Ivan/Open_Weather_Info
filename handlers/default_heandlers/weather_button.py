@@ -1,13 +1,20 @@
 from telebot import types
-from telebot.types import Message, CallbackQuery
+from telebot.types import CallbackQuery
 
 from loader import bot
 from states.user_states import UserInfoState
+from utils.logging_setting import exception_handler
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('weather_button'))
+@exception_handler
 def weather_button(call: CallbackQuery) -> None:
-    # bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
+    """
+    Функция, предоставляющая в виде inline кнопок выбор
+    периода информирования по погоде.
+    :param call: CallbackQuery
+    :return: None
+    """
 
     start_menu = types.InlineKeyboardMarkup(row_width=1)
     weather_now = types.InlineKeyboardButton(

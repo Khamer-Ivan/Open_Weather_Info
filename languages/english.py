@@ -1,4 +1,11 @@
+"""
+Словарь для хранения английского
+варианта сообщений
+"""
 translation = {
+    'start_': 'Start the bot',
+    'help_': 'Output help',
+    'history_': 'Output history',
     'weather': 'Check the weather',
     'history': 'Request history',
     'choose_command': 'Please select a command.',
@@ -14,6 +21,7 @@ translation = {
     'res_7': 'Sunrise:',
     'res_8': 'Sunset:',
     'res_9': 'Daylight hours:',
+    'res_10': '😊 have a nice day',
     'log_day': 'Request the current weather in the city',
     'error': '📝Check that the city is entered correctly.📝',
     'res_five_day_0': 'Weather for',

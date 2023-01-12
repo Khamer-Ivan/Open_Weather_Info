@@ -1,8 +1,10 @@
 from telebot.handler_backends import State, StatesGroup
-from languages import russian
 
 
 class UserInfoState(StatesGroup):
+    """
+    Класс для хранения состояний пользователя
+    """
     user_id = 0
     user_call = ''
     user_full_name = ''

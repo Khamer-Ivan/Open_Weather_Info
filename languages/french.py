@@ -1,4 +1,11 @@
+"""
+Словарь для хранения французского
+варианта сообщений
+"""
 translation = {
+    'start_': 'Démarrer le bot',
+    'help_': "voir l'aide",
+    'history_': "Faire ressortir l'histoire",
     'weather': 'Connaître la météo',
     'history': 'Historique des requêtes',
     'choose_command': 'Veuillez sélectionner une équipe.',
@@ -14,6 +21,7 @@ translation = {
     'res_7': 'Lever:',
     'res_8': 'Coucher du soleil:',
     'res_9': 'Durée du jour:',
+    'res_10': '😊 Passe une bonne journée',
     'log_day': 'Demande de la météo actuelle dans la ville',
     'error': '📝Vérifiez que la ville est correctement entrée.📝',
     'res_five_day_0': 'Météo sur',
