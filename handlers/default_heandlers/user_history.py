@@ -106,5 +106,5 @@ def history_for_all(call: CallbackQuery) -> None:
         bot.send_message(call.message.chat.id, text)
         delite_history_button.delete_all(call)
     else:
-        bot.send_message(bot.message.chat.id, UserInfoState.language['history_empty'])
+        bot.send_message(call.message.chat.id, UserInfoState.language['history_empty'])
         main_menu(call)
