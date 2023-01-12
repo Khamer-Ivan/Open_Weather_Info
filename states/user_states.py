@@ -10,5 +10,5 @@ class UserInfoState(StatesGroup):
     user_full_name = State()
     flag_day = State()
     flag_5_day = State()
-    language = State()
-    language_code = State()
+    language = {}
+    language_code = ''
