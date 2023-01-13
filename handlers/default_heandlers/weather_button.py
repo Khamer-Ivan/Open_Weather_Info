@@ -2,12 +2,9 @@ from telebot import types
 from telebot.types import CallbackQuery
 
 from loader import bot
-from states.user_states import UserInfoState
-from utils.logging_setting import exception_handler
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('weather_button'))
-@exception_handler
 def weather_button(call: CallbackQuery) -> None:
     """
     Функция, предоставляющая в виде inline кнопок выбор

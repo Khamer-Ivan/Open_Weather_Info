@@ -8,7 +8,6 @@ from googletrans import Translator
 from config_data.config import WEATHER_KEY
 from loader import bot
 from structure import weather_image
-from states.user_states import UserInfoState
 from utils.wind_description import wind_info
 from handlers.default_heandlers.weather_button import weather_button
 from handlers.default_heandlers.start import Weather
@@ -32,7 +31,7 @@ def start_message(call: CallbackQuery) -> None:
         except Exception as error:
             logger.error(f'User ID: {data["user_id"]} exception', exc_info=error)
             bot.send_message(data["user_id"], 'В работе бота возникла ошибка.'
-                                                        '\nПопробуйте ещё раз.')
+                                              '\nПопробуйте ещё раз.')
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('now'))
@@ -52,7 +51,7 @@ def start_message(call: CallbackQuery) -> None:
         except Exception as error:
             logger.error(f'User ID: {data["user_id"]} exception', exc_info=error)
             bot.send_message(data["user_id"], 'В работе бота возникла ошибка.'
-                                                        '\nПопробуйте ещё раз.')
+                                              '\nПопробуйте ещё раз.')
 
 
 @bot.message_handler()
@@ -112,7 +111,7 @@ def get_weather(message: Message) -> None:
                     user_id=message.from_user.id, name=message.from_user.full_name,
                     request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 )
-                weather_button(UserInfoState.user_call)
+                weather_button(data['user_call'])
 
             elif data['flag_5_day'] == 1:
                 city = requests.get(
@@ -130,7 +129,7 @@ def get_weather(message: Message) -> None:
         except Exception as error:
             logger.error(f'User ID: {data["user_id"]} exception', exc_info=error)
             bot.send_message(data["user_id"], 'В работе бота возникла ошибка.'
-                                                        '\nПопробуйте ещё раз.')
+                                              '\nПопробуйте ещё раз.')
 
 
 def weather_for_week(city, lat, lon, message: Message) -> None:
@@ -189,8 +188,8 @@ def weather_for_week(city, lat, lon, message: Message) -> None:
                 user_id=message.from_user.id, name=message.from_user.full_name,
                 request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             )
-            weather_button(UserInfoState.user_call)
+            weather_button(data['user_call'])
         except Exception as error:
             logger.error(f'User ID: {data["user_id"]} exception', exc_info=error)
             bot.send_message(data["user_id"], 'В работе бота возникла ошибка.'
-                                                        '\nПопробуйте ещё раз.')
+                                              '\nПопробуйте ещё раз.')

@@ -2,7 +2,6 @@ from telebot import types
 from telebot.types import CallbackQuery
 
 from loader import bot
-from states.user_states import UserInfoState
 
 
 def delete_day(call: CallbackQuery):

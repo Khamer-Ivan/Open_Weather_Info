@@ -7,7 +7,6 @@ from loader import bot
 from handlers.default_heandlers.start import Weather
 from keyboards.inline import delite_history_button
 from handlers.default_heandlers.menu import main_menu
-from states.user_states import UserInfoState
 
 
 @bot.callback_query_handler(func=lambda call: call.data.endswith('user_history'))

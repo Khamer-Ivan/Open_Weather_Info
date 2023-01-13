@@ -1,6 +1,5 @@
 from telebot import types
 from telebot.types import CallbackQuery
-from states.user_states import UserInfoState
 from loader import bot
 from utils.logging_setting import logger
 
@@ -15,7 +14,7 @@ def main_menu(call: CallbackQuery) -> None:
     """
     with bot.retrieve_data(call.message.chat.id) as data:
         try:
-            UserInfoState.user_call = call
+            data['user_call'] = call
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
             start_menu = types.InlineKeyboardMarkup(row_width=1)
             weather_button = types.InlineKeyboardButton(

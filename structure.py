@@ -1,4 +1,3 @@
-from states.user_states import UserInfoState
 from loader import bot
 from telebot.types import Message
 

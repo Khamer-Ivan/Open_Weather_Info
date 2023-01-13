@@ -1,12 +1,10 @@
 from datetime import datetime
 from timedelta import Timedelta
-from telebot.types import Message, CallbackQuery
+from telebot.types import CallbackQuery
 
 from loader import bot
 from handlers.default_heandlers.start import Weather
 from handlers.default_heandlers.menu import main_menu
-from states.user_states import UserInfoState
-from utils.logging_setting import exception_handler
 from utils.logging_setting import logger
 
 
@@ -21,7 +19,7 @@ def delete_day(call: CallbackQuery) -> None:
         try:
             message_counter = 0
             for history in Weather.select().where(
-                    (Weather.user_id == UserInfoState.user_id)
+                    (Weather.user_id == data['user_id'])
                     & (Weather.date.startswith(datetime.now().strftime("%Y-%m-%d")))):
                 history.delete_instance()
                 message_counter += 1
@@ -48,7 +46,7 @@ def delete_week(call: CallbackQuery) -> None:
             now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             week_ago = date_days_before.strftime("%Y-%m-%d %H:%M:%S")
             for history in Weather.select().where(
-                    (Weather.user_id == UserInfoState.user_id)
+                    (Weather.user_id == data['user_id'])
                     & (Weather.date.between(week_ago, now))):
                 history.delete_instance()
                 message_counter += 1
@@ -71,7 +69,7 @@ def delete_all(call: CallbackQuery) -> None:
     with bot.retrieve_data(call.message.chat.id) as data:
         try:
             message_counter = 0
-            for history in Weather.select().where(Weather.user_id == UserInfoState.user_id):
+            for history in Weather.select().where(Weather.user_id == data['user_id']):
                 history.delete_instance()
                 message_counter += 1
             bot.send_message(call.message.chat.id, f'{data["language"]["delete_history"]}'
