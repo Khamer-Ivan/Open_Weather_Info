@@ -24,8 +24,8 @@ def start_message(call: CallbackQuery) -> None:
     """
     with bot.retrieve_data(call.message.chat.id) as data:
         try:
-            bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
             data['flag_5_day'] = 1
+            bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
             bot.send_message(
                 call.message.chat.id, data['language']['weather_5_days'])
         except Exception as error:
@@ -44,14 +44,16 @@ def start_message(call: CallbackQuery) -> None:
     """
     with bot.retrieve_data(call.message.chat.id) as data:
         try:
-            bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
             data['flag_day'] = 1
+            bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id)
             bot.send_message(
                 call.message.chat.id, data['language']['weather_one_day'])
+            print(data['flag_day'])
         except Exception as error:
             logger.error(f'User ID: {data["user_id"]} exception', exc_info=error)
             bot.send_message(data["user_id"], 'В работе бота возникла ошибка.'
                                               '\nПопробуйте ещё раз.')
+            print('ошибка')
 
 
 @bot.message_handler()
@@ -183,7 +185,7 @@ def weather_for_week(city, lat, lon, message: Message) -> None:
             for day_info in weather_list:
                 text += f'\n{day_info}\n'
             bot.send_message(message.from_user.id, text)
-            text = f'{data["language"]["log_five"]}{city}'
+            text = f'{data["language"]["log_five"]} {city}'
             Weather.create(
                 user_id=message.from_user.id, name=message.from_user.full_name,
                 request=text, date=datetime.now().strftime("%Y-%m-%d %H:%M:%S")

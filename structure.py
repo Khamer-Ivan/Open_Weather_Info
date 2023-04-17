@@ -40,3 +40,6 @@ def weather_image(message: Message) -> dict:
                     'Snow': 'Schnee 🌨',
                     'Mist': 'Der Nebel 🌫'
                     }
+
+
+
